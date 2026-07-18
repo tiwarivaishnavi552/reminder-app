@@ -1,4 +1,4 @@
-# reminder-app
+# reminder-app 
 
 A personal productivity dashboard — daily schedule, task/goal tracking, and
 browser notifications for study/work blocks. Runs entirely client-side

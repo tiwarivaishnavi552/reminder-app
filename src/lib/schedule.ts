@@ -5,8 +5,18 @@ export function timeToMinutes(time: string): number {
   return h * 60 + m;
 }
 
-export function nowMinutes(date = new Date()): number {
-  return date.getHours() * 60 + date.getMinutes();
+export function nowMinutes(date = new Date(), timeZone?: string): number {
+  if (!timeZone) return date.getHours() * 60 + date.getMinutes();
+
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone,
+    hourCycle: "h23",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).formatToParts(date);
+  const hour = Number(parts.find((p) => p.type === "hour")?.value ?? 0);
+  const minute = Number(parts.find((p) => p.type === "minute")?.value ?? 0);
+  return hour * 60 + minute;
 }
 
 export function formatTime(time: string): string {

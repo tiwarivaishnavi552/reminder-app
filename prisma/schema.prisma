@@ -1,0 +1,31 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model AppState {
+  id        String   @id @default("singleton")
+  data      Json
+  updatedAt DateTime @updatedAt
+
+  @@map("app_state")
+}
+
+model DeviceSubscription {
+  id           String   @id @default(cuid())
+  endpoint     String   @unique
+  p256dh       String
+  auth         String
+  browser      String
+  os           String
+  userAgent    String
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  lastActiveAt DateTime @default(now())
+
+  @@map("device_subscription")
+}

@@ -1,12 +1,21 @@
 import type { AppData } from "./types";
 
-const STORAGE_KEY = "reminder-app:data";
+export function todayKey(date = new Date(), timeZone?: string): string {
+  if (!timeZone) return date.toISOString().slice(0, 10);
 
-export function todayKey(date = new Date()): string {
-  return date.toISOString().slice(0, 10);
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(date);
+  const year = parts.find((p) => p.type === "year")?.value;
+  const month = parts.find((p) => p.type === "month")?.value;
+  const day = parts.find((p) => p.type === "day")?.value;
+  return `${year}-${month}-${day}`;
 }
 
-function defaultData(): AppData {
+export function defaultData(): AppData {
   return {
     schedule: [
       { id: crypto.randomUUID(), title: "Deep Study Session", startTime: "06:15", endTime: "08:15" },
@@ -26,32 +35,13 @@ function defaultData(): AppData {
   };
 }
 
-export function loadData(): AppData {
-  if (typeof window === "undefined") return defaultData();
-
-  const raw = window.localStorage.getItem(STORAGE_KEY);
-  if (!raw) return defaultData();
-
-  try {
-    const parsed = JSON.parse(raw) as AppData;
-    return rollDay(parsed);
-  } catch {
-    return defaultData();
-  }
-}
-
-export function saveData(data: AppData): void {
-  if (typeof window === "undefined") return;
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-}
-
 /** If the stored data is from a previous day, roll goals/study time over and update the streak. */
-export function rollDay(data: AppData): AppData {
-  const today = todayKey();
+export function rollDay(data: AppData, timeZone?: string): AppData {
+  const today = todayKey(new Date(), timeZone);
   if (data.currentDay === today) return data;
 
   const madeProgressYesterday = data.goals.some((g) => g.done) || data.studyMinutesToday > 0;
-  const yesterday = todayKey(new Date(Date.now() - 86400000));
+  const yesterday = todayKey(new Date(Date.now() - 86400000), timeZone);
   const isConsecutive = data.currentDay === yesterday;
 
   const streak = madeProgressYesterday ? (isConsecutive ? data.streak + 1 : 1) : isConsecutive ? data.streak : 0;

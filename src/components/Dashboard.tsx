@@ -2,10 +2,13 @@
 
 import { useAppData } from "@/hooks/useAppData";
 import { NotificationBanner } from "./NotificationBanner";
+import { NotificationDeniedNotice } from "./NotificationDeniedNotice";
 import { CurrentTaskCard } from "./CurrentTaskCard";
 import { GoalsPanel } from "./GoalsPanel";
 import { StudyPanel } from "./StudyPanel";
 import { ScheduleEditor } from "./ScheduleEditor";
+import { DevicesPanel } from "./DevicesPanel";
+import { InstallButton } from "./InstallButton";
 
 export function Dashboard() {
   const {
@@ -27,14 +30,18 @@ export function Dashboard() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-6 px-4 py-10">
-      <header>
-        <h1 className="text-3xl font-bold">My Study OS</h1>
-        <p className="text-sm text-black/50 dark:text-white/50">
-          {now.toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" })}
-        </p>
+      <header className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold">My Study OS</h1>
+          <p className="text-sm text-black/50 dark:text-white/50">
+            {now.toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" })}
+          </p>
+        </div>
+        <InstallButton />
       </header>
 
       <NotificationBanner permission={permission} onRequest={requestPermission} />
+      <NotificationDeniedNotice permission={permission} />
 
       <CurrentTaskCard schedule={data.schedule} now={now} />
 
@@ -49,6 +56,8 @@ export function Dashboard() {
       </div>
 
       <ScheduleEditor schedule={data.schedule} onAdd={addBlock} onRemove={removeBlock} />
+
+      <DevicesPanel />
     </div>
   );
 }
